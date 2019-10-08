@@ -30,6 +30,7 @@ namespace ConsoleAppDiagnostics
             Debug.WriteLine("Moving the character " + x + " : " + y);
 
             Debug.Assert(GameState.Map != null, "There was no Map defined in the GameState.");
+            Trace.TraceError("This error is an error, everything is fine.");
 
             Position = GameState.Map?.RequestPosition(Position.X + x, Position.Y + y, this);
 

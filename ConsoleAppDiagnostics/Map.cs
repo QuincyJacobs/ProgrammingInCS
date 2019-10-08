@@ -33,6 +33,7 @@ namespace ConsoleAppDiagnostics
 
         public void Draw()
         {
+            Trace.TraceInformation("Started drawing the map");
             Console.Clear();
 
             var mapString = new StringBuilder();
@@ -65,31 +66,37 @@ namespace ConsoleAppDiagnostics
             }
 
             Console.WriteLine(mapString.ToString());
+            Trace.TraceInformation("Finished drawing the map");
         }
 
         public Vector2 RequestPosition(int x, int y, GameObject gameObject)
         {
+            Trace.TraceInformation("Requested a position from map");
             var result = new Vector2(x, y);
 
             // bounds check
             if(x > Size.X)
             {
                 Debug.WriteLine("X too big!");
+                Trace.TraceWarning("X too big!");
                 result.X = Size.X;
             }
             else if(x <= 0)
             {
                 Debug.WriteLine("X too small!");
+                Trace.TraceWarning("X too small!");
                 result.X = 1;
             }
             if (y > Size.Y)
             {
                 Debug.WriteLine("Y too big!");
+                Trace.TraceWarning("Y too big!");
                 result.Y = Size.Y;
             }
             else if (y <= 0)
             {
                 Debug.WriteLine("Y too small!");
+                Trace.TraceWarning("Y too small!");
                 result.Y = 1;
             }
 
@@ -99,6 +106,8 @@ namespace ConsoleAppDiagnostics
             {
                 Tiles[gameObject.Position.X, gameObject.Position.Y] = null;
             }
+
+            Trace.TraceInformation("Finished requesting a position from map");
 
             return result;
         }
