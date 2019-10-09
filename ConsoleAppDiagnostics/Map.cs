@@ -34,8 +34,6 @@ namespace ConsoleAppDiagnostics
         public void Draw()
         {
             Trace.TraceInformation("Started drawing the map");
-            Console.Clear();
-
             var mapString = new StringBuilder();
 
             for (int j = 0; j < Size.Y+2; j++)

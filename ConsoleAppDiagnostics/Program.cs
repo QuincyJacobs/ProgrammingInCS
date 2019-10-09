@@ -48,15 +48,20 @@ namespace ConsoleAppDiagnostics
 
             #region Trace source and switch
 
-            SourceSwitch control = new SourceSwitch("control", "Controls the tracing")
+            // switch trace level of the custom tracesource
+            var control = new SourceSwitch("control", "Controls the tracing")
             {
                 Level = SourceLevels.All
             };
 
-            TraceSource trace = new TraceSource("Tray-zor", SourceLevels.All)
+            var trace = new TraceSource("Tray-zor", SourceLevels.All)
             {
                 Switch = control
             };
+
+            // switch trace level of the static "Trace"
+            var traceSwitch = new TraceSwitch("General", "The entire application");
+            traceSwitch.Level = TraceLevel.Verbose;
 
             // Add trace listeners to custom trace source
             trace.Listeners.Add(consoleListener);
@@ -83,8 +88,84 @@ namespace ConsoleAppDiagnostics
 
             #endregion
 
+            #region Performance
+
+            Stopwatch stopwatch = new Stopwatch();
+
+            // this needs adminisrator rights
+            if (!PerformanceCounterCategory.Exists("AverageCount64NewCounterOfMineCategory"))
+            {
+
+                CounterCreationDataCollection counterDataCollection = new CounterCreationDataCollection();
+
+                // Add the counter.
+                CounterCreationData newCounterOfMine = new CounterCreationData();
+                newCounterOfMine.CounterType = PerformanceCounterType.AverageCount64;
+                newCounterOfMine.CounterName = "NewCounterOfMine";
+                counterDataCollection.Add(newCounterOfMine);
+
+                // Add another counter.
+                CounterCreationData newerCounterOfMine = new CounterCreationData();
+                newerCounterOfMine.CounterType = PerformanceCounterType.AverageBase;
+                newerCounterOfMine.CounterName = "NewerCounterOfMine";
+                counterDataCollection.Add(newerCounterOfMine);
+
+                // Create the category.
+                PerformanceCounterCategory.Create("AverageCount64NewCounterOfMineCategory",
+                    "Demonstrates usage of the NewCounterCategory performance counter type.",
+                    PerformanceCounterCategoryType.SingleInstance, counterDataCollection);
+                Trace.WriteLine("Created loopCounter");
+            }
+
+            var loopCounter = new PerformanceCounter("AverageCount64NewCounterOfMineCategory",
+             "NewerCounterOfMine",
+             false)
+            {
+                RawValue = 0
+            };
+
+            var performance = new PerformanceCounter("Processor Information",
+             "% Processor Time",
+             "_Total");
+
+            #endregion
+
+            #region EventLog
+
+            // Create the source, if it does not already exist.
+            if (!EventLog.SourceExists("MySource"))
+            {
+                //An event log source should not be created and immediately used.
+                //There is a latency time to enable the source, it should be created
+                //prior to executing the application that uses the source.
+                //Execute this sample a second time to use the new source.
+                EventLog.CreateEventSource("MySource", "MyNewLog");
+                Console.WriteLine("CreatedEventSource");
+                Console.WriteLine("Exiting, execute the application a second time to use the source.");
+                // The source is created.  Exit the application to allow it to be registered.
+                return;
+            }
+
+            // Create an EventLog instance and assign its source.
+            EventLog myLog = new EventLog();
+            myLog.Source = "MySource";
+
+            // Write an informational entry to the event log.    
+            myLog.WriteEntry("Writing to event log.");
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            foreach(EventLogEntry entry in myLog.Entries)
+            {
+                Console.WriteLine("Source: {0}, Type: {1}, Time: {2}, Message: {3}", entry.Source, entry.EntryType, entry.TimeWritten, entry.Message);
+            }
+            Console.ForegroundColor = ConsoleColor.White;
+
+            #endregion
+
             for (;;)
             {
+                
+
                 // trace
                 configSource.TraceEvent(TraceEventType.Verbose, 191919, "Start of iteration of the eternal loop");
                 trace.TraceEvent(TraceEventType.Verbose, 10000, "Start of iteration of the eternal loop");
@@ -92,14 +173,40 @@ namespace ConsoleAppDiagnostics
 
                 // logic
                 var read = Console.ReadKey().KeyChar;
+                Console.Clear();
+                stopwatch.Restart();
                 GameState.Character.ProcessInput(read);
                 GameState.Map.Draw();
+
+                // stopwatch
+                stopwatch.Stop();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("\tms after processing input: {0}", stopwatch.ElapsedMilliseconds);
+                Console.WriteLine("\tTicks after processing input: {0}", stopwatch.ElapsedTicks);
+                Console.WriteLine("\tTime after processing input: {0}", stopwatch.Elapsed);
+                Console.ForegroundColor = ConsoleColor.White;
+                stopwatch.Start();
 
                 // trace
                 Trace.WriteLine("Drawn the map");
                 Trace.WriteLine("End of the iteration of the eternal loop");
                 trace.TraceEvent(TraceEventType.Verbose, 10001, "End of iteration of the eternal loop");
                 configSource.TraceEvent(TraceEventType.Verbose, 191920, "End of iteration of the eternal loop");
+
+                // stopwatch
+                stopwatch.Stop();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("\tCumulative ms after 4 trace calls: {0}", stopwatch.ElapsedMilliseconds);
+                Console.WriteLine("\tCumulative ticks after 4 trace calls: {0}", stopwatch.ElapsedTicks);
+                Console.WriteLine("\tCumulative time after 4 trace calls: {0}", stopwatch.Elapsed);
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.ForegroundColor = ConsoleColor.Yellow;
+
+                // counters
+                loopCounter.IncrementBy(20);
+                Console.WriteLine("% of processor time: {0}", performance.NextValue());
+                Console.WriteLine("Our own counter: {0}", loopCounter.NextValue());
+                Console.ForegroundColor = ConsoleColor.White;
             }
         }
     }
