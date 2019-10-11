@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProgrammingInCS", "ProgrammingInCS\ProgrammingInCS.csproj", "{DD8E8AAD-C100-47B2-B1E3-998F2AED31A4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Chapter-3.3-Assemblies", "Chapter-3.3-Assemblies", "{56225FD4-44CD-4DEB-AA0B-740F6B1C4D96}"
+	ProjectSection(SolutionItems) = preProject
+		ReadMe.txt = ReadMe.txt
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyMainProject", "AssemblyMainProject\AssemblyMainProject.csproj", "{94DAFB0F-4161-43A9-84E2-05740CCBFAA5}"
 EndProject

@@ -28,7 +28,7 @@ namespace ConsoleAppDiagnostics
             TraceListener consoleListener = new ConsoleTraceListener();
             // delimited records by a ';', can be used for xls for example
             TraceListener delimitexListTraceListener = new DelimitedListTraceListener("logs_D-Limitor5000.txt");
-            // event log requires you to register the event log in windows
+            // event log requires you to run visual studio in administrator mode and create a new or use an exisitng event log.
             //EventLogTraceListener eventLogTraceListener = new EventLogTraceListener("EventSource");
             // windows event schema
             TraceListener eventSchemaTraceListener = new EventSchemaTraceListener("logs_SchemingEvent.xsd");
@@ -154,7 +154,7 @@ namespace ConsoleAppDiagnostics
             myLog.WriteEntry("Writing to event log.");
 
             Console.ForegroundColor = ConsoleColor.Green;
-            foreach(EventLogEntry entry in myLog.Entries)
+            foreach (EventLogEntry entry in myLog.Entries)
             {
                 Console.WriteLine("Source: {0}, Type: {1}, Time: {2}, Message: {3}", entry.Source, entry.EntryType, entry.TimeWritten, entry.Message);
             }
@@ -162,9 +162,9 @@ namespace ConsoleAppDiagnostics
 
             #endregion
 
-            for (;;)
+            for (; ; )
             {
-                
+
 
                 // trace
                 configSource.TraceEvent(TraceEventType.Verbose, 191919, "Start of iteration of the eternal loop");
